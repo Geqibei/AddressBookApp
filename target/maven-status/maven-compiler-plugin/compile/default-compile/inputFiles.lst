@@ -1,0 +1,11 @@
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/web/UpdateServlet.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/web/DeleteServlet.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/util/SqlSessionFactoryUtils.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/web/AddServlet.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/web/DeleteByIdsServlet.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/pojo/Contact.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/service/ContactService.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/web/SelectAllServlet.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/service/ContactServiceImpl.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/web/SelectByConditionServlet.java
+/Users/haizhuwang/IdeaProjects/AddressBookApp/src/main/java/mapper/ContactMapper.java

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace名称空间-->
+<mapper namespace="mapper.ContactMapper">
+<!--    <select id="selectAll" resultType="pojo.Contact">-->
+<!--        select * fetch records;-->
+<!--    </select>-->
+
+
+    <delete id="deleteByIds">
+        delete from records
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">#{id}</foreach>
+    </delete>
+
+    <delete id="delete">
+        delete from records
+        where id = #{id}
+    </delete>
+
+
+    <select id="selectByCondition" resultType="pojo.Contact">
+        select *
+        from records
+        <where>
+            <if test="firstName != null and firstName != '' ">
+                and  firstName like #{firstName}
+            </if>
+
+            <if test="lastName != null and lastName != '' ">
+                and  lastName like #{lastName}
+            </if>
+
+
+        </where>
+
+    </select>
+
+
+
+</mapper>

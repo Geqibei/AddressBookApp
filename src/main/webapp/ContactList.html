@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <meta charset="UTF-8">
+    <title>AddressBookApp</title>
+
+    <style>
+        .el-table .warning-row {
+            background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <el-form :inline="true" :model="record" class="demo-form-inline">
+        <el-form-item label="FirstName">
+            <el-input v-model="record.firstName" placeholder="FirstName"></el-input>
+        </el-form-item>
+        <el-form-item label="LastName">
+            <el-input v-model="record.lastName" placeholder="LastName"></el-input><!-- v-model="record.lastName" -->
+        </el-form-item>
+
+        <el-form-item>
+            <el-button type="primary" @click="selectByCondition">search</el-button>
+        </el-form-item>
+    </el-form>
+
+    <el-row>
+        <el-button type="danger" plain @click="deleteByIds">batch delete</el-button>
+        <el-button type="primary" plain @click="dialogVisible = true; newRecordFresh()">add</el-button>
+    </el-row>
+
+<!--add a new record -->
+    <el-dialog
+            title="add a record"
+            :visible.sync="dialogVisible"
+            width="30%"
+
+            >
+        <el-form ref="form" :model="record" label-width="80px">
+            <el-form-item label="FirstName">
+                <el-input v-model="record.firstName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="LastName">
+                <el-input v-model="record.lastName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="Email">
+                <el-input v-model="record.email"></el-input>
+            </el-form-item>
+
+            <el-form-item label="Phone">
+                <el-input v-model="record.phone"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="addRecord">submit</el-button>
+                <el-button @click="dialogVisible = false">cancle</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+
+
+    <!--update a record -->
+    <el-dialog @close="updateVisible = false; newRecordFresh() "
+            title="update a record"
+            :visible.sync="updateVisible"
+            width="30%"
+    >
+        <el-form ref="form" :model="record" label-width="80px">
+            <el-form-item label="FirstName">
+                <el-input v-model="record.firstName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="LastName">
+                <el-input v-model="record.lastName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="Email">
+                <el-input v-model="record.email"></el-input>
+            </el-form-item>
+
+            <el-form-item label="Phone">
+                <el-input v-model="record.phone"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="updateRecord;newRecordFresh()">submit</el-button>
+                <el-button @click="updateVisible = false; newRecordFresh() ">cancle</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+
+
+
+
+    <template >
+        <el-table
+                :data="tableData"
+                style="width: 100%"
+                :row-class-name="tableRowClassName"
+                @selection-change="handleSelectionChange"
+        >
+
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <el-table-column
+                    type="index"
+                    width="50">
+            </el-table-column>
+<!--   jiade         -->
+            <el-table-column
+                    prop="id"
+                    label="id"
+                    v-if="false">
+            </el-table-column>
+<!--            -->
+            <el-table-column
+                    prop="firstName"
+                    label="FirstName"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="lastName"
+                    label="LastName"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="email"
+                    label="Email">
+            </el-table-column>
+            <el-table-column
+                    prop="phone"
+                    label="Phone">
+            </el-table-column>
+            <el-table-column
+
+                    label="Operation">
+                <el-row slot-scope="scope">
+                    <el-button type="primary" @click="echo(scope.row)">update</el-button>
+                    <el-button type="danger" @click="deleteOne(scope.row)">delete</el-button>
+                </el-row>
+            </el-table-column>
+        </el-table>
+    </template>
+</div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+  new Vue({
+      el:"#app",
+
+      mounted(){
+          //Send asynchronous requests for data
+          this.selectAll();
+      },
+
+
+      created() {
+          Vue.use(Element)
+      },
+      methods: {
+          newRecordFresh(){
+              this.record = {
+                  firstName: '',
+                  lastName: '',
+                  email: '',
+                  phone: '',
+                  id:''
+              }
+          }
+          ,
+          echo(row){
+              this.record = row;
+              this.updateVisible = true;
+
+          },
+          deleteOne(row){
+              this.selectedIds[0] = row.id;
+              this.$confirm('are you sure to delete data','hint',{
+                  confirmButtonText:'yes',
+                  cancelButtonText:"no",
+                  type:'warning'
+              }).then(() => {
+                  var _this = this;
+                  axios({
+                      method:"post",
+                      url:"http://localhost:60/AddressBookApp/deleteByIdsServlet",
+                      data:_this.selectedIds
+                  }).then(function (resp){
+                      if(resp.data == "success"){
+                          _this.selectAll();
+                          _this.$message({
+                              showClose: true,
+                              message: 'success',
+                              type: 'success'
+                          });
+                      }
+                  })
+              }).catch(() => {
+                  this.$message({
+                      type:'info',
+                      message:'delete cancel'
+                  });
+              });
+          },
+
+
+          deleteByIds(){
+              this.$confirm('are you sure to delete data','hint',{
+                  confirmButtonText:'yes',
+                  cancelButtonText:"no",
+                  type:'warning'
+              }).then(() => {
+                  for(let i =0; i < this.multipleSelection.length; i++){
+                      this.selectedIds[i] = this.multipleSelection[i].id;
+                  }
+
+                  var _this = this;
+                  axios({
+                      method:"post",
+                      url:"http://localhost:60/AddressBookApp/deleteByIdsServlet",
+                      data:_this.selectedIds
+                  }).then(function (resp){
+                      if(resp.data == "success"){
+                          _this.selectAll();
+                          _this.$message({
+                              showClose: true,
+                              message: 'success',
+                              type: 'success'
+                          });
+                      }
+                  })
+              }).catch(() => {
+                  this.$message({
+                      type:'info',
+                      message:'delete cancel'
+                  });
+              });
+          },
+
+
+          selectByCondition(){
+              var _this = this;
+              axios({
+                  method:"post",
+                  url:"http://localhost:60/AddressBookApp/selectByConditionServlet",
+                  data:this.record
+              }).then(function (resp){
+                  _this.tableData = resp.data;
+              })
+          },
+
+          selectAll(){
+              var _this = this;
+              axios({
+                  method:"get",
+                  url:"http://localhost:60/AddressBookApp/selectAllServlet",
+
+              }).then(function (resp){
+                  _this.tableData = resp.data;
+              })
+          },
+
+          tableRowClassName({row, rowIndex}) {
+              if (rowIndex === 1) {
+                  return 'warning-row';
+              } else if (rowIndex === 3) {
+                  return 'success-row';
+              }
+              return '';
+          },
+
+          handleSelectionChange(val) {
+              this.multipleSelection = val;
+          },
+          onSubmit() {
+              console.log(this.record);
+          },
+          addRecord(){
+              var _this = this;
+              axios({
+                  method:"post",
+                  url:"http://localhost:60/AddressBookApp/addServlet",
+                  data:_this.record
+              }).then(function (resp){
+                  if(resp.data == "success"){
+                      _this.dialogVisible = false;
+                      _this.selectAll();
+                      _this.record = {
+                          firstName: '',
+                          lastName: '',
+                          email: '',
+                          phone: '',
+                          id:''
+                      };
+                      _this.$message({
+                          showClose: true,
+                          message: 'success',
+                          type: 'success'
+                      });
+                  }
+              })
+          },
+          updateRecord(){
+              var _this = this;
+              axios({
+                  method:"post",
+                  url:"http://localhost:60/AddressBookApp/updateServlet",
+                  data:_this.record
+              }).then(function (resp){
+                  if(resp.data == "success"){
+                      _this.updateVisible = false;
+                      _this.selectAll();
+                      _this.$message({
+                          showClose: true,
+                          message: 'success',
+                          type: 'success'
+                      });
+                  }
+              })
+          }
+      },
+      data() {
+          return {
+              selectedIds:[],
+              currentRow:null,
+              //dialog when adding a new record
+              dialogVisible: false,
+              //dialog when updating a record
+              updateVisible: false,
+              //search form data
+              record: {
+                  firstName: '',
+                  lastName: '',
+                  email: '',
+                  phone: '',
+                  id:''
+              },
+              //table data
+              tableData: [{
+                  firstName: '',
+                  lastName: '',
+                  email: '',
+                  phone: ''
+              }, {
+                  firstName: '',
+                  lastName: '',
+                  email: '',
+                  phone: ''
+              }],
+              //multipleselection
+              multipleSelection: []
+          }
+      }
+  })
+</script>
+
+</body>
+</html>

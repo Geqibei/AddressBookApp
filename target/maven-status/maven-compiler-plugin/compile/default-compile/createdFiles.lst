@@ -1,0 +1,9 @@
+service/ContactService.class
+web/AddServlet.class
+web/DeleteServlet.class
+web/SelectByConditionServlet.class
+web/UpdateServlet.class
+web/SelectAllServlet.class
+web/DeleteByIdsServlet.class
+service/ContactServiceImpl.class
+util/SqlSessionFactoryUtils.class
